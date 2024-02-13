@@ -106,71 +106,9 @@ std::istream & operator>>(std::istream &is, Suit &suit) {
 //   operator==
 //   operator!=
 
-Rank string_to_rank(const std::string &str){
-  string uppercaseStr = str;
-
-  for(int i = 0; i < str.length(); i++){
-    uppercaseStr[i] =toupper(uppercaseStr[i]);
-  }
- if (uppercaseStr == "TWO") {
-        return TWO;
-    } else if (uppercaseStr == "THREE") {
-        return THREE;
-    } else if (uppercaseStr == "FOUR") {
-        return FOUR;
-    } else if (uppercaseStr == "FIVE") {
-        return FIVE;
-    } else if (uppercaseStr == "SIX") {
-        return SIX;
-    } else if (uppercaseStr == "SEVEN") {
-        return SEVEN;
-    } else if (uppercaseStr == "EIGHT") {
-        return EIGHT;
-    } else if (uppercaseStr == "NINE") {
-        return NINE;
-    } else if (uppercaseStr == "TEN") {
-        return TEN;
-    } else if (uppercaseStr == "JACK") {
-        return JACK;
-    } else if (uppercaseStr == "QUEEN") {
-        return QUEEN;
-    } else if (uppercaseStr == "KING") {
-        return KING;
-    } 
-    else (uppercaseStr == "ACE");
-    {
-        return ACE;
-    }
-}
-
-std::ostream & operator<<(std::ostream &os, Rank rank){
-  os << rank;
-}
-
-std::istream & operator>>(std::istream &is, Rank &rank){
-  is >> rank;
-}
-
-Suit string_to_suit(const std::string &str){
-  string uppercaseStr = str;
-
-  for(int i = 0; i < str.length(); i++){
-    uppercaseStr[i] =toupper(uppercaseStr[i]);
-  }
-  if(uppercaseStr == "SPADES"){
-    return SPADES;
-  }else if(uppercaseStr == "HEARTS"){
-    return HEARTS;
-  } else if(uppercaseStr == "CLUBS"){
-    return CLUBS;
-  } else (uppercaseStr == "DIAMONDS");
-  {
-    return DIAMONDS;
-  }
-}
-
 Card::Card(){
-  Rank(0), Suit(0);
+  rank = TWO;
+  suit = SPADES;
 };
 
 Card::Card(Rank rank_in, Suit suit_in){
@@ -221,11 +159,13 @@ bool Card::is_trump(Suit trump) const{
 
 std::ostream & operator<<(std::ostream &os, const Card &card){
   os << card.get_rank() << " of " << card.get_suit();
+  return os;
 }
 
 std::istream & operator>>(std::istream &is, Card &card){
   string filler;
   is >> card.rank >> filler >> card.suit;
+  return is;
 }
 
 bool operator<(const Card &lhs, const Card &rhs){
@@ -237,37 +177,63 @@ bool operator<=(const Card &lhs, const Card &rhs){
 }
 
 bool operator>(const Card &lhs, const Card &rhs){
-
+  return lhs.get_rank() > rhs.get_rank();
 }
 
 bool operator>=(const Card &lhs, const Card &rhs){
-
+  return lhs.get_rank() >= rhs.get_rank();
 }
 
 bool operator==(const Card &lhs, const Card &rhs){
-
+  return lhs.get_rank() == rhs.get_rank();
 }
 
 bool operator!=(const Card &lhs, const Card &rhs){
-
+  return lhs.get_rank() != rhs.get_rank();
 }
 
 Suit Suit_next(Suit suit){
-  int next = 4;
-  if(suit == 0){
+  if(suit == SPADES){
     return CLUBS;
   }
-  else if(suit== 1){
+  else if(suit== HEARTS){
    return DIAMONDS;
   }
-  else if(suit == 2){
+  else if(suit == CLUBS){
     return SPADES;
   }
-  else if(suit== 3){
+  else if(suit== DIAMONDS){
     return HEARTS;
   }
+  return SPADES;
 }
 
 bool Card_less(const Card &a, const Card &b, Suit trump){
-  
+  if(b.is_right_bower(trump)){
+    return true;
+  }
+  if(b.is_left_bower(trump) && !(a.is_right_bower(trump))){
+    return true;
+  }
+  if(b.is_trump(trump) && a.get_rank() < b.get_rank()){
+    return true;
+  }
+  return false;
+}
+
+bool Card_less(const Card &a, const Card &b, const Card &led_card, Suit trump){
+  if(b.is_right_bower(trump)){
+    return true;
+  }
+  if(b.is_left_bower(trump) && !(a.is_right_bower(trump))){
+    return true;
+  }
+  if(b.is_trump(trump) && a.get_rank() < b.get_rank()){
+    return true;
+  }
+
+  if(a.get_rank() < b.get_rank() && a.get_suit() != trump){
+    return true;
+  }
+  return false;
 }
