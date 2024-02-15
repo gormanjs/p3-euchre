@@ -10,18 +10,18 @@ Pack::Pack() : next(0) {
     }
 }
 
-Pack::Pack(std::istream& pack_input){
+Pack::Pack(std::istream& pack_input) : next(0){
     
     std::string rank;
+    std::string junk;
     std::string suit;
 
     for (int i = 0; i < PACK_SIZE; i++){
-        pack_input >> rank >> suit;
+        pack_input >> rank >> junk >> suit;
         Rank r = string_to_rank(rank);
         Suit s = string_to_suit(suit);
         cards[i] = Card(r, s);
     }
-    
 
 }
 
@@ -30,9 +30,7 @@ Card Pack::deal_one() {
 }
 
 void Pack::reset() {
-    
     next = 0;
-
 }
 
 void Pack::shuffle() {
@@ -45,7 +43,7 @@ void Pack::shuffle() {
             temp[i] = cards[(PACK_SIZE / 2) -  1 - trackeven];
             trackeven++;
             }
-            if( i % 2 != 0){
+            else if( i % 2 != 0){
             temp[i] = cards[(PACK_SIZE / 2) + trackodd];
             trackodd++;
             }
