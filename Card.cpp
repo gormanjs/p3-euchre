@@ -111,11 +111,8 @@ Card::Card(){
   suit = SPADES;
 };
 
-Card::Card(Rank rank_in, Suit suit_in){
-  rank = rank_in;
-  suit = suit_in;
-}
-
+Card::Card(Rank rank_in, Suit suit_in) : rank(rank_in), suit(suit_in){}
+  
 Rank Card::get_rank() const{
   return rank;
 }
@@ -129,28 +126,28 @@ Suit Card::get_suit(Suit trump) const{
 }
 
 bool Card::is_face_or_ace() const{
-  return rank == 9 || rank == 10 || rank == 11 || rank == 12;
+  return rank == JACK || rank == QUEEN || rank == KING || rank == ACE;
 }
 
 bool Card::is_right_bower(Suit trump) const{
-  return rank == 9 && suit == trump;
+  return rank == JACK && suit == trump;
 }
 
 bool Card::is_left_bower(Suit trump) const{
   int next = 4;
-  if(trump == 0){
-    next = 2;
+  if(trump == SPADES){
+    next = CLUBS;
   }
-  else if(trump == 1){
-    next = 3;
+  else if(trump == HEARTS){
+    next = DIAMONDS;
   }
-  else if(trump == 2){
-    next = 0;
+  else if(trump == CLUBS){
+    next = SPADES;
   }
-  else if(trump == 3){
-    next = 1;
+  else if(trump == DIAMONDS){
+    next = HEARTS;
   }
-  return rank == 9 && suit == next;
+  return rank == JACK && suit == next;
 }
 
 bool Card::is_trump(Suit trump) const{
@@ -212,13 +209,15 @@ bool Card_less(const Card &a, const Card &b, Suit trump){
   if(b.is_right_bower(trump)){
     return true;
   }
-  if(b.is_left_bower(trump) && !(a.is_right_bower(trump))){
+  else if(b.is_left_bower(trump) && !(a.is_right_bower(trump))){
     return true;
   }
-  if(b.is_trump(trump) && a.get_rank() < b.get_rank()){
+  else if(b.is_trump(trump) && a.get_rank() < b.get_rank()){
     return true;
   }
-  return false;
+  else{
+    return false;
+  }
 }
 
 bool Card_less(const Card &a, const Card &b, const Card &led_card, Suit trump){
@@ -231,9 +230,8 @@ bool Card_less(const Card &a, const Card &b, const Card &led_card, Suit trump){
   if(b.is_trump(trump) && a.get_rank() < b.get_rank()){
     return true;
   }
-
-  if(a.get_rank() < b.get_rank() && a.get_suit() != trump){
-    return true;
+  if(a.get_suit() == led_card.get_suit() && b.get_suit() == led_card.get_suit()) {
+    return a.get_rank() < b.get_rank();
   }
-  return false;
+    return a.get_rank() < b.get_rank();
 }
