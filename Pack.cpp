@@ -40,11 +40,11 @@ void Pack::shuffle() {
         int trackeven = 0;
         for(int i = 0; i < PACK_SIZE; i++){
             if( i % 2 == 0){
-            temp[i] = cards[(PACK_SIZE / 2) -  1 - trackeven];
+            temp[i] = cards[(PACK_SIZE / 2) + trackeven];
             trackeven++;
             }
             else if( i % 2 != 0){
-            temp[i] = cards[(PACK_SIZE / 2) + trackodd];
+            temp[i] = cards[trackodd];
             trackodd++;
             }
         }
