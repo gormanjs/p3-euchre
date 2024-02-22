@@ -111,8 +111,11 @@ Card::Card(){
   suit = SPADES;
 };
 
-Card::Card(Rank rank_in, Suit suit_in) : rank(rank_in), suit(suit_in){}
-  
+Card::Card(Rank rank_in, Suit suit_in)
+: rank(rank_in), suit(suit_in)
+{
+}
+
 Rank Card::get_rank() const{
   return rank;
 }
@@ -121,33 +124,38 @@ Suit Card::get_suit() const{
   return suit;
 }
 
+//EFFECTS Returns the suit
+//HINT: the left bower is the trump suit!
 Suit Card::get_suit(Suit trump) const{
-  return trump;
+  if(is_left_bower(trump)){
+    return trump;
+  }
+  return suit;
 }
 
 bool Card::is_face_or_ace() const{
-  return rank == JACK || rank == QUEEN || rank == KING || rank == ACE;
+  return rank == 9 || rank == 10 || rank == 11 || rank == 12;
 }
 
 bool Card::is_right_bower(Suit trump) const{
-  return rank == JACK && suit == trump;
+  return rank == 9 && suit == trump;
 }
 
 bool Card::is_left_bower(Suit trump) const{
   int next = 4;
-  if(trump == SPADES){
-    next = CLUBS;
+  if(trump == 0){
+    next = 2;
   }
-  else if(trump == HEARTS){
-    next = DIAMONDS;
+  else if(trump == 1){
+    next = 3;
   }
-  else if(trump == CLUBS){
-    next = SPADES;
+  else if(trump == 2){
+    next = 0;
   }
-  else if(trump == DIAMONDS){
-    next = HEARTS;
+  else if(trump == 3){
+    next = 1;
   }
-  return rank == JACK && suit == next;
+  return rank == 9 && suit == next;
 }
 
 bool Card::is_trump(Suit trump) const{
@@ -166,6 +174,10 @@ std::istream & operator>>(std::istream &is, Card &card){
 }
 
 bool operator<(const Card &lhs, const Card &rhs){
+  //(D > C > H > S).
+  if(lhs.get_rank() == rhs.get_rank()){
+    return lhs.get_suit() < rhs.get_suit();
+  }
   return lhs.get_rank() < rhs.get_rank();
 }
 
@@ -174,6 +186,9 @@ bool operator<=(const Card &lhs, const Card &rhs){
 }
 
 bool operator>(const Card &lhs, const Card &rhs){
+  if(lhs.get_rank() == rhs.get_rank()){
+    return lhs.get_suit() > rhs.get_suit();
+  }
   return lhs.get_rank() > rhs.get_rank();
 }
 
@@ -209,15 +224,13 @@ bool Card_less(const Card &a, const Card &b, Suit trump){
   if(b.is_right_bower(trump)){
     return true;
   }
-  else if(b.is_left_bower(trump) && !(a.is_right_bower(trump))){
+  if(b.is_left_bower(trump) && !(a.is_right_bower(trump))){
     return true;
   }
-  else if(b.is_trump(trump) && a.get_rank() < b.get_rank()){
+  if(b.is_trump(trump) && a.get_rank() < b.get_rank()){
     return true;
   }
-  else{
-    return false;
-  }
+  return false;
 }
 
 bool Card_less(const Card &a, const Card &b, const Card &led_card, Suit trump){
@@ -230,8 +243,9 @@ bool Card_less(const Card &a, const Card &b, const Card &led_card, Suit trump){
   if(b.is_trump(trump) && a.get_rank() < b.get_rank()){
     return true;
   }
-  if(a.get_suit() == led_card.get_suit() && b.get_suit() == led_card.get_suit()) {
-    return a.get_rank() < b.get_rank();
+
+  if(a.get_rank() < b.get_rank() && a.get_suit() != trump){
+    return true;
   }
-    return a.get_rank() < b.get_rank();
+  return false;
 }
