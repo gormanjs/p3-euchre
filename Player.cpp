@@ -16,6 +16,7 @@ class SimplePlayer : public Player {
     //add_card
     void add_card(const Card &c) override {
         hand.push_back(c);
+        std::sort(hand.begin(), hand.end());
     }
 
     //make trump
@@ -56,7 +57,7 @@ class SimplePlayer : public Player {
     }
 
     void add_and_discard(const Card &upcard) override {
-        hand.push_back(upcard);
+        add_card(upcard);
         auto card = upcard;
         for(int i = 1; i < hand.size(); i++){
             if(hand[i].get_rank() < card.get_rank()){
@@ -93,7 +94,13 @@ class SimplePlayer : public Player {
         }
     } else { // If all cards are trump, play the highest trump card
         for (size_t i = 1; i < hand.size(); i++) {
-            if (hand[i].get_rank() > lead.get_rank()) {
+            if(hand[i].is_right_bower(trump)) {
+                return hand[i];
+            }
+            else if(hand[i].is_left_bower(trump)) {
+                return hand[i];
+            }
+            else if(hand[i].get_rank() > lead.get_rank()) {
                 lead = hand[i];
                 spot = i;
             }

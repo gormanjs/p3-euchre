@@ -24,6 +24,9 @@ TEST(test_card_suit_and_rank) {
     Card five_hearts = Card(FIVE, HEARTS);
     ASSERT_EQUAL(five_hearts.get_rank(), FIVE);
     ASSERT_EQUAL(five_hearts.get_suit(), HEARTS);
+    Card jack_hearts = Card(JACK, HEARTS);
+    ASSERT_FALSE(five_hearts.is_face_or_ace());
+    ASSERT_TRUE(jack_hearts.is_face_or_ace());
 }
 
 TEST(test_card_type) {
@@ -87,6 +90,14 @@ TEST(test_Card_less){
     //Card_less with led_card
     ASSERT_FALSE(Card_less(jack_spades, jack_clubs, two_spades, SPADES));
     ASSERT_TRUE(Card_less(king, ace, queen, SPADES));
+}
+
+TEST(test_greater_than_or_equal) {
+    Card six_diamonds = Card(SIX, DIAMONDS);
+    Card six_spades = Card(SIX, SPADES);
+    Card ace_spades = Card(ACE, SPADES);
+    ASSERT_TRUE(six_spades >= six_diamonds);
+    ASSERT_TRUE(ace_spades >= six_spades);
 }
 
 TEST(test_greater_and_less){
