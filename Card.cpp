@@ -122,7 +122,10 @@ Suit Card::get_suit() const{
 }
 
 Suit Card::get_suit(Suit trump) const{
-  return trump;
+  if(is_left_bower(trump)){
+    return trump;
+  }
+  return suit;
 }
 
 bool Card::is_face_or_ace() const{

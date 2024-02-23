@@ -16,7 +16,6 @@ class SimplePlayer : public Player {
     //add_card
     void add_card(const Card &c) override {
         hand.push_back(c);
-        std::sort(hand.begin(), hand.end());
     }
 
     //make trump
@@ -43,7 +42,7 @@ class SimplePlayer : public Player {
             }
             for (size_t i = 0; i < hand.size(); i++){
                 if (hand[i].is_face_or_ace() && 
-                    Suit_next(upcard.get_suit()) == upcard.get_suit()){
+                    hand[i].get_suit() == Suit_next(upcard.get_suit())){
                         round_two_count++;
                     }
             }
@@ -57,7 +56,7 @@ class SimplePlayer : public Player {
     }
 
     void add_and_discard(const Card &upcard) override {
-        add_card(upcard);
+        hand.push_back(upcard);
         auto card = upcard;
         for(int i = 1; i < hand.size(); i++){
             if(hand[i].get_rank() < card.get_rank()){
@@ -94,13 +93,7 @@ class SimplePlayer : public Player {
         }
     } else { // If all cards are trump, play the highest trump card
         for (size_t i = 1; i < hand.size(); i++) {
-            if(hand[i].is_right_bower(trump)) {
-                return hand[i];
-            }
-            else if(hand[i].is_left_bower(trump)) {
-                return hand[i];
-            }
-            else if(hand[i].get_rank() > lead.get_rank()) {
+            if (hand[i].get_rank() > lead.get_rank()) {
                 lead = hand[i];
                 spot = i;
             }
