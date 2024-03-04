@@ -14,6 +14,7 @@ private:
   int dealerIndex = 0;
   Suit trump = SPADES;
   int leadingPlayer = (dealerIndex + 1) % players.size();
+  string playerType = "";
 
   void shuffle() {
     pack.shuffle();
@@ -57,29 +58,60 @@ private:
   }
   //double check to make sure dealer picks up upcard if ordered up
   
-  void play_hand(Suit trump, int leadingPlayer, Player* players) {
+  void play_hand(Card highest, int leadingPlayer, Player* players) {
+    Suit trump;
+    Card highest;
+    
     //figure out who is winning
     Card played = players[leadingPlayer].lead_card(trump);
+    highest = played;
+    for(int i = 0; i < 3; i++) {
     int nextPlayer = (leadingPlayer + 1) % 4;
-    //if()
-    //compare cards to see who has the lead
+    played = players[nextPlayer].play_card(highest, trump);
+    if(Card_less(highest, played, played, trump)) {
+        highest = played;
+    }
+
+    }
+    
   }
-  void add_and_discard();
+  void add_and_discard(Card upcard, int currentPlayer) {
+    players[currentPlayer]->add_and_discard(upcard);
+  }
+
+  
 
  public:
- 
-//create an array of player pointers to initialize
-  Player *players;
 
-  Game(const string filename, int points_to_win, bool shuffle)
-        : pointsToWin(points_to_win), defaultShuffle(shuffle) {
-            //initialize pack
-            ifstream inputFile(filename);
-            Pack(inputFile);
+ Game(int argc, char* argv[]) { //player constructor
+
+    for (int i = 4; i < argc; i += 2) {
+            std::string playerName = argv[i];
+            std::string playerStrategy = argv[i + 1];
+            players.push_back(Player_factory(playerName, playerStrategy));
+    }
+ }
+
+ 
+
+  Game(const string filename, string in, int points_to_win, const vector<pair<string, string>>& playerData) {
+        ifstream inputFile(filename);
+        pack = Pack(inputFile);
+        pointsToWin = points_to_win;
+        if (in != "noshuffle") {
+            defaultShuffle = true;
         }
 
-  void play() {
+        for (const auto& data : playerData) {
+            string playerName = data.first;
+            string playerStrategy = data.second;
+            players.push_back(Player_factory(playerName, playerStrategy));
+        }
+    }
 
+  void play() {
+    int score1 = 0;
+    int score2 = 0;
     // shuffle deck is specified
     if (defaultShuffle){
         pack.shuffle();
@@ -90,7 +122,12 @@ private:
 
     // keep track of dealer index
     for (int i = dealerIndex; i < players.size(); i++){
-        // deal in order: 1, 2, 3, 0
+        deal(dealerIndex);
+        if(make_trump)
+        
+        
+
+
 
     }
     
@@ -106,9 +143,13 @@ private:
 
 
 int main(int argc, char **argv) {
-
+    //./euchre.exe pack.in noshuffle 1 Adi Simple Barbara Simple Chi-Chih Simple Dabbala Simple 
     // Game game(/* game details */);
     // game.play();
+    std::vector<Player*> players;
+    string filename = argv[1];
+    string shuffle = argv[2];
+    int points_to_win = stoi(argv[3]);
   
     if (argc != 12 || argv[2] != "shuffle" || argv[2] != "noshuffle" 
         || stoi(argv[3]) < 1 || stoi(argv[3]) > 100 
@@ -122,13 +163,30 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    string filename = argv[1];
+
+    
     ifstream packFile(filename);
 
     if (!packFile.is_open()){
         cout << "Error opening filename: " << filename << endl;
         return 2;
     }
+
+    vector<pair<string, string>> playerData; 
+
+    for (int i = 4; i < argc; i += 2) {
+        string playerName = argv[i];
+        string playerType = argv[i + 1];
+        playerData.push_back({playerName, playerType});
+    }
+
+
+    Game game(filename, shuffle, points_to_win, playerData);
+    game.play();
+
+
+
+    
 
 
 
