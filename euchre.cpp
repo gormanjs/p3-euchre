@@ -8,14 +8,62 @@ class Game {
 private:
   std::vector<Player*> players;
   Pack pack;
-  int pointsToWin;
+  int score = 0;
+  int pointsToWin = 0;
   bool defaultShuffle = false;
   int dealerIndex = 0;
+  Suit trump = SPADES;
+  int leadingPlayer = (dealerIndex + 1) % players.size();
 
-  void shuffle();
-  void deal();
-  void make_trump();
-  void play_hand();
+  void shuffle() {
+    pack.shuffle();
+  }
+
+  void deal(int dealerIndex) {
+    int currentPlayer = (dealerIndex + 1) % players.size();
+    for (int deal1 = 0; deal1 < 2; deal1++) {
+        for (int i = 0; i < 4; i++) { // Deal 3-2-3-2 cards
+            players[currentPlayer]->add_card(pack.deal_one());
+            if (i % 2 == 1) // After dealing 2 cards, move to the next player
+                currentPlayer = (currentPlayer + 1) % players.size();
+        }
+    }
+    for (int deal2 = 0; deal2 < 2; deal2++) {
+        for (int i = 0; i < 4; i++) { // Deal 2-3-2-3 cards
+            if (i % 2 == 0) // Before dealing 3 cards, move to the next player
+                currentPlayer = (currentPlayer + 1) % players.size();
+            players[currentPlayer]->add_card(pack.deal_one());
+        }
+    }
+  }
+
+  void make_trump(int dealerIndex) {
+    Card upcard = pack.deal_one();
+    bool is_dealer = false;
+    for(int round = 1; round <= 2; round++) {
+    int currentPlayer = (dealerIndex + 1) % players.size();
+    for(int i = 0; i < 4; i++) {
+        if(currentPlayer == dealerIndex) {
+            is_dealer = true;
+        }
+        if(players[currentPlayer]->make_trump(upcard, is_dealer, round, trump)) {
+            return;
+        }
+        else {
+            currentPlayer = (currentPlayer + 1) % players.size();
+        }
+    }
+  }
+  }
+  //double check to make sure dealer picks up upcard if ordered up
+  
+  void play_hand(Suit trump, int leadingPlayer, Player* players) {
+    //figure out who is winning
+    Card played = players[leadingPlayer].lead_card(trump);
+    int nextPlayer = (leadingPlayer + 1) % 4;
+    //if()
+    //compare cards to see who has the lead
+  }
   void add_and_discard();
 
  public:
@@ -33,7 +81,7 @@ private:
   void play() {
 
     // shuffle deck is specified
-    if (defaultShuffle = true){
+    if (defaultShuffle){
         pack.shuffle();
     }
     else {
