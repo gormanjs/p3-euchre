@@ -58,18 +58,28 @@ private:
   }
   //double check to make sure dealer picks up upcard if ordered up
   
-  void play_hand(Card highest, int leadingPlayer, Player* players) {
+  void play_hand(bool &team1, bool &team2 ,Card highest, int leadingPlayer, Player* players) {
     Suit trump;
     Card highest;
-    
+    int upteam = 0;
     //figure out who is winning
     Card played = players[leadingPlayer].lead_card(trump);
     highest = played;
     for(int i = 0; i < 3; i++) {
     int nextPlayer = (leadingPlayer + 1) % 4;
+    upteam = (upteam + 1) % 4;
     played = players[nextPlayer].play_card(highest, trump);
     if(Card_less(highest, played, played, trump)) {
         highest = played;
+        if(upteam % 2 == 0) {
+            team1 = true;
+            team2 = false;
+        }
+        else {
+            team2 = true;
+            team1 = false;
+        }
+        
     }
 
     }
