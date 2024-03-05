@@ -8,7 +8,9 @@ class Game {
 private:
   std::vector<Player*> players;
   Pack pack;
-  int score = 0;
+  int teamdecided = 2;
+  int score1 = 0;
+  int score2 = 0;
   int pointsToWin = 0;
   bool defaultShuffle = false;
   int dealerIndex = 0;
@@ -36,9 +38,10 @@ private:
             players[currentPlayer]->add_card(pack.deal_one());
         }
     }
+    
   }
 
-  void make_trump(int dealerIndex) {
+  void make_trump() {
     Card upcard = pack.deal_one();
     bool is_dealer = false;
     for(int round = 1; round <= 2; round++) {
@@ -48,6 +51,12 @@ private:
             is_dealer = true;
         }
         if(players[currentPlayer]->make_trump(upcard, is_dealer, round, trump)) {
+            if(currentPlayer == 1 || currentPlayer == 3) {
+                teamdecided = 1;
+            }
+            else {
+                teamdecided = 2;
+            }
             return;
         }
         else {
@@ -56,38 +65,62 @@ private:
     }
   }
   }
-  //double check to make sure dealer picks up upcard if ordered up
+  //determines game winner
+  void winner(string condition) {
+    
+    if(condition == "win1") {
+        //cout team 1 wins
+    }
+    else if(condition == "win2") {
+
+    }
+  }
+//determines trick winner based on scoring funtion
+  void trick_winner(bool team1) {
+    if(team1) {
+        score1++;
+    }
+    else {
+        score2++;
+    }
+  }
+//use to keep track of each teams score during the game
+  void scoring() {}
   
-  void play_hand(bool &team1, bool &team2 ,Card highest, int leadingPlayer, Player* players) {
-    Suit trump;
+  
+  //team 1 is player 1 and 3 and team 2 is player 0 and 2
+  void play_hand(int leadingPlayer) {
+    vector<int> track;
+    bool team1 = false;
     Card highest;
-    int upteam = 0;
+    Card led;
     //figure out who is winning
-    Card played = players[leadingPlayer].lead_card(trump);
+    Card played = players[leadingPlayer]->lead_card(trump);
+    track.push_back(leadingPlayer);
+    led = played;
     highest = played;
     for(int i = 0; i < 3; i++) {
     int nextPlayer = (leadingPlayer + 1) % 4;
-    upteam = (upteam + 1) % 4;
-    played = players[nextPlayer].play_card(highest, trump);
-    if(Card_less(highest, played, played, trump)) {
+    played = players[nextPlayer]->play_card(highest, trump);
+    if(Card_less(highest, played, led, trump)) {
         highest = played;
-        if(upteam % 2 == 0) {
-            team1 = true;
-            team2 = false;
-        }
-        else {
-            team2 = true;
-            team1 = false;
-        }
-        
+        track.push_back(nextPlayer);
+    }
+    }
+    if(track[track.size() - 1] == 1 || track[track.size() - 1] == 3) {
+        team1 = true;
+    }
+    else {
+        team1 =false;
     }
 
-    }
+    trick_winner(team1);
     
   }
   void add_and_discard(Card upcard, int currentPlayer) {
     players[currentPlayer]->add_and_discard(upcard);
   }
+
 
   
 
@@ -120,8 +153,6 @@ private:
     }
 
   void play() {
-    int score1 = 0;
-    int score2 = 0;
     // shuffle deck is specified
     if (defaultShuffle){
         pack.shuffle();

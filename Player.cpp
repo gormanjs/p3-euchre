@@ -217,6 +217,7 @@ class HumanPlayer : public Player {
         std::cout << "Human player " << HumanName << ", please select a card:\n";
         std::cin >> choice;
         lead = hand[choice];
+        hand.erase(hand.begin() + choice);
         return lead;
     }
 
@@ -227,6 +228,7 @@ class HumanPlayer : public Player {
         std::cout << "Human player " << HumanName << ", please select a card:\n";
         std::cin >> choice;
         lead = hand[choice];
+        hand.erase(hand.begin() + choice);
         return lead;
     }
 
