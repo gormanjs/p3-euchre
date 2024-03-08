@@ -15,6 +15,9 @@ class SimplePlayer : public Player {
 
     //add_card
     void add_card(const Card &c) override {
+        if(hand.size() == 5) {
+            std::cout << "error";
+        }
         hand.push_back(c);
     }
 
@@ -182,7 +185,7 @@ class HumanPlayer : public Player {
         std::cout << "Human player " << HumanName << ", please enter a suit, or \"pass\":\n";
         std::string decision;
         std::cin >> decision;
-        if(decision != "pass") {
+        if(decision != "pass"){ 
             order_up_suit = string_to_suit(decision);
             return true;
         }
@@ -194,18 +197,17 @@ class HumanPlayer : public Player {
     }
 
     void add_and_discard(const Card &upcard) override {
-        add_card(upcard);
-        auto card = upcard;
         int choice;
         print_hand();
         std::cout << "Discard upcard: [-1]\n";
         std::cout << "Human player " << HumanName << ", please select a card to discard:\n";
         std::cin >> choice;
         if(choice == -1) {
-            hand.erase(remove(hand.begin(), hand.end(), card),hand.end());
+            return;
         }
         else {
             hand.erase(hand.begin() + choice);
+            add_card(upcard);
         }
         
     }
@@ -232,7 +234,6 @@ class HumanPlayer : public Player {
         return lead;
     }
 
-    friend std::ostream & operator<<(std::ostream &os, const Player &p);
 };
 
 std::ostream & operator<<(std::ostream &os, const Player &p) {
