@@ -29,7 +29,7 @@ private:
 
 
   void deal(int dealerIndex) {
-    int currentPlayer = (dealerIndex + 1) % players.size();
+    int currentPlayer = (dealerIndex + 1) % 4;//static_cast<int>(players.size());
     
        // Deal 3-2-3-2 cards
     for(int i = 0; i < 2; i++) {
@@ -42,7 +42,6 @@ private:
         }
         currentPlayer = (currentPlayer + 1) % players.size();
     }
-    
     
     // Deal 2-3-2-3 cards
     for(int p = 0; p < 2; p++) {
@@ -62,18 +61,20 @@ private:
   }
     //change
   void make_trump() {
-    bool is_dealer = false;
+    //bool is_dealer = false;
     for(int round = 1; round <= 2; round++) {
     int currentPlayer = (dealerIndex + 1) % players.size();
-    for(int i = 0; i < 4; i++) {
-        if(currentPlayer == dealerIndex) {
-            is_dealer = true;
-        }
-        if(players[currentPlayer]->make_trump(start, is_dealer, round, trump)) {
+        for(int i = 0; i < 4; i++) {
+        // is_dealer = false;
+        // if(currentPlayer == dealerIndex) {
+        //     is_dealer = true;
+        // }
+        if(players[currentPlayer]->make_trump(start, currentPlayer == dealerIndex, round, trump)) {
             if(round == 1) {
                 add_and_discard(start, dealerIndex);
             }
             cout << players[currentPlayer]->get_name() << " orders up " << trump << endl;
+            cout << "\n";
             if(currentPlayer == 1 || currentPlayer == 3) {
                 teamdecided = 1;
             }
@@ -132,7 +133,7 @@ private:
   }
 //determines trick winner based on scoring funtion
   void trick_winner(bool team1) {
-    cout << players[track[track.size() - 1]]->get_name() << " takes the trick" << endl;
+    cout << players[track[track.size() - 1]]->get_name() << " takes the trick\n\n";
     if(team1) {
         score1++;
     }
@@ -198,10 +199,11 @@ private:
         track.push_back(leadingPlayer);
         led = played;
         highest = played;
-        int nextPlayer = leadingPlayer + 1;
+        int nextPlayer = (leadingPlayer + 1) % players.size();
         for(int i = 0; i < 3; i++) 
         {
-            played = players[nextPlayer]->play_card(highest, trump);
+            //highest changed to led in playcard
+            played = players[nextPlayer]->play_card(led, trump);
             cout << played << " played by " << players[nextPlayer]->get_name() << endl;
             if(Card_less(highest, played, led, trump)) 
             {

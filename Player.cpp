@@ -39,6 +39,7 @@ class SimplePlayer : public Player {
         }
         int round_two_count = 0;
         if (round == 2){
+            //change back
             if (is_dealer){
                 order_up_suit = upcard.get_suit();
                 return true;
@@ -50,7 +51,8 @@ class SimplePlayer : public Player {
                     }
             }
             if (round_two_count >= 1){
-                order_up_suit = upcard.get_suit();
+                //issue here order up the suit that best fits players hand
+                order_up_suit = Suit_next(upcard.get_suit());
                 return true;
             }
             return false;
@@ -75,7 +77,7 @@ class SimplePlayer : public Player {
 
     Card lead_card(Suit trump) override{
          Card lead = hand[0];
-         int spot;
+         int spot = 0;
     bool has_non_trump = false;
 
     // Check if there are non-trump cards in the hand
@@ -88,14 +90,14 @@ class SimplePlayer : public Player {
 
     // If there are non-trump cards, play the highest one
     if (has_non_trump) {
-        for (size_t i = 1; i < hand.size(); i++) {
+        for (size_t i = 0; i < hand.size(); i++) {
             if (!hand[i].is_trump(trump) && hand[i].get_rank() > lead.get_rank()) {
                 lead = hand[i];
                 spot = i;
             }
         }
     } else { // If all cards are trump, play the highest trump card
-        for (size_t i = 1; i < hand.size(); i++) {
+        for (size_t i = 0; i < hand.size(); i++) {
             if (hand[i].get_rank() > lead.get_rank()) {
                 lead = hand[i];
                 spot = i;
@@ -113,14 +115,14 @@ class SimplePlayer : public Player {
         Suit ledSuit = led_card.get_suit();
 
         bool has_suit = false;
-        Rank highest = hand[0].get_rank();
-
+        Card highest = hand[0];
         //check if player has card of led suit
-        for (auto i = 0; i < hand.size(); i++){
+        for (int i = 0; i < static_cast<int>(hand.size()); i++){
+            //std::cout << "Rank: " << hand[i].get_rank() << " , Suit: " << hand[i].get_suit() << "\n";
             if (hand[i].get_suit() == ledSuit){
                 has_suit = true;
-                if (Card_less(hand[i], Card(highest, ledSuit), led_card, trump)){
-                    highest = hand[i].get_rank();
+                if (Card_less(highest, hand[i], led_card, trump)){
+                    highest = hand[i];
                 }
             }
         }
@@ -128,7 +130,7 @@ class SimplePlayer : public Player {
         //play highest of led suit if has
         if (has_suit){
             for (auto i = 0; i < hand.size(); i++){
-                if (hand[i].get_suit() == ledSuit && hand[i].get_rank() == highest){
+                if (hand[i].get_suit() == ledSuit && hand[i] == highest){
                     //create temporary card because need to delete it
                     Card played = hand[i];
                     hand.erase(hand.begin() + i);
